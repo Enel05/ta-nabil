@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Interview Assistant</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="logo">
+                <i class="fa-solid fa-microphone-lines"></i>
+                <h2>IntelliSense</h2>
+            </div>
+            <nav>
+                <a href="#" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-users"></i> Personas</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-lightbulb"></i> Insights</a>
+            </nav>
+            <div class="status-indicator">
+                <span class="dot disconnected" id="ws-status-dot"></span>
+                <span id="ws-status-text">Disconnected</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-titles">
+                    <h1>Real-Time Smart Interview</h1>
+                    <p>Building User Persona & Probing Recommendations</p>
+                </div>
+                
+                <div class="context-input-container glass-panel" style="flex-grow: 1; margin: 0 20px; padding: 5px 15px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-bullseye text-primary"></i>
+                    <input type="text" id="app-context-input" placeholder="Masukkan konteks aplikasi yang sedang dirancang (opsional)..." style="background: transparent; border: none; color: var(--text-main); width: 100%; outline: none; font-weight: 500;">
+                    <button id="save-context-btn" class="btn primary-btn btn-sm" style="white-space: nowrap;"><i class="fa-solid fa-save"></i> Simpan</button>
+                </div>
+
+                <div class="controls">
+                    <button id="record-btn" class="btn primary-btn">
+                        <i class="fa-solid fa-play"></i> Mulai Wawancara
+                    </button>
+                    <button id="stop-btn" class="btn danger-btn" disabled>
+                        <i class="fa-solid fa-stop"></i> Hentikan
+                    </button>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Transcript Section -->
+                <section class="card transcript-section glass-panel">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-comments"></i> Live Transcript</h3>
+                        <div class="recording-wave" id="recording-wave" style="display: none;">
+                            <span></span><span></span><span></span><span></span>
+                        </div>
+                    </div>
+                    <div class="transcript-box" id="transcript-box">
+                        <div class="system-message">Menunggu percakapan dimulai...</div>
+                        <!-- Transcripts will appear here -->
+                    </div>
+                </section>
+
+                <!-- Right Column: Probing & Persona -->
+                <div class="right-column">
+                    <!-- Probing Recommendations -->
+                    <section class="card probing-section glass-panel">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-bolt text-warning"></i> AI Probing Suggestions</h3>
+                            <span class="badge">Real-time</span>
+                        </div>
+                        <div class="suggestions-box" id="suggestions-box">
+                            <p class="placeholder-text">Sistem akan merekomendasikan pertanyaan lanjutan saat wawasan belum lengkap.</p>
+                        </div>
+                    </section>
+
+                    <!-- Persona Builder -->
+                    <section class="card persona-section glass-panel">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-id-card text-accent"></i> Persona Builder</h3>
+                        </div>
+                        <div class="persona-grid">
+                            <!-- Demographics -->
+                            <div class="persona-item full-width">
+                                <h4><i class="fa-solid fa-address-card"></i> Profile Overview</h4>
+                                <div class="profile-stats">
+                                    <div><strong>Name:</strong> <span id="persona-name">Belum diketahui</span></div>
+                                    <div><strong>Age:</strong> <span id="persona-age">Belum diketahui</span></div>
+                                    <div><strong>Occupation:</strong> <span id="persona-occupation">Belum diketahui</span></div>
+                                    <div><strong>Location:</strong> <span id="persona-location">Belum diketahui</span></div>
+                                    <div><strong>Personality:</strong> <span id="persona-personality">Belum diketahui</span></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Radar Chart -->
+                            <div class="persona-item full-width chart-container">
+                                <h4><i class="fa-solid fa-radar"></i> Persona Analytics</h4>
+                                <canvas id="personaChart"></canvas>
+                            </div>
+
+                            <div class="persona-item">
+                                <h4>Goals</h4>
+                                <ul id="persona-goals" class="persona-list"></ul>
+                            </div>
+                            <div class="persona-item">
+                                <h4>Motivations</h4>
+                                <ul id="persona-motivations" class="persona-list"></ul>
+                            </div>
+                            <div class="persona-item">
+                                <h4>Needs</h4>
+                                <ul id="persona-needs" class="persona-list"></ul>
+                            </div>
+                            <div class="persona-item">
+                                <h4>Pain Points</h4>
+                                <ul id="persona-painpoints" class="persona-list"></ul>
+                            </div>
+                            <div class="persona-item">
+                                <h4>Behaviors</h4>
+                                <div id="persona-behaviors">Belum diketahui</div>
+                            </div>
+                            <div class="persona-item">
+                                <h4>Interests</h4>
+                                <ul id="persona-interests" class="persona-list"></ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Recommendations Section -->
+            <section class="card features-section glass-panel mt-4">
+                <div class="card-header">
+                    <h3><i class="fa-solid fa-wand-magic-sparkles text-primary"></i> Product & UX Recommendations</h3>
+                    <button id="generate-recommendations-btn" class="btn secondary-btn btn-sm">
+                        Generate Now
+                    </button>
+                </div>
+                <div class="recommendations-box" id="recommendations-box">
+                    <p class="placeholder-text">Fitur dan UI/UX akan direkomendasikan berdasarkan Persona yang terbentuk.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

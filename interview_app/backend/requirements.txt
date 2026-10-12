@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+websockets
+openai
+python-dotenv
+aiofiles
+pyannote.audio==3.1.1
+soundfile
+numpy
+diart

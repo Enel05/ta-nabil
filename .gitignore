@@ -1,0 +1,23 @@
+# Environment variables (PENTING: Jangan upload API Key ke GitHub)
+.env
+.env.local
+.env.*
+!.env.example
+
+# Temporary recording and audio/video files
+interview_app/backend/*.wav
+interview_app/backend/*.mp4
+interview_app/backend/*.webm
+interview_app/backend/logs/
+
+# Python cache and environments
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+
+# System and IDE files
+.DS_Store
+.vscode/
+.idea/
